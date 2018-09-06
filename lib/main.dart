@@ -1,18 +1,59 @@
 import 'package:flutter/material.dart';
+import 'dart:ui' as ui;
 
-void main() => runApp(MaterialApp(
-  home: HomePage(),
-  debugShowCheckedModeBanner: false,
-));
-
-class HomePage extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() => _HomePageState();
+void main() {
+  runApp(
+    MaterialApp(
+      home: SignApp(),
+      debugShowCheckedModeBanner: false,
+    )
+  );
 }
 
-class _HomePageState extends State<HomePage> {
+class SignApp extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return SignAppState();
+  }
+}
 
+class SignAppState extends State<SignApp> {
+  GlobalKey<SignatureState> signatureKey = GlobalKey();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Signature(key: signatureKey),
+      persistentFooterButtons: <Widget>[
+        OutlineButton(onPressed: () {
+          
+        })
+      ],
+    );
+  }
+}
+
+class Signature extends StatefulWidget {
+  Signature({Key key}): super(key: key);
+
+  @override
+  State<StatefulWidget> createState() {
+    return SignatureState();
+  }
+}
+
+class SignatureState extends State<Signature> {
   List<Offset> _points = <Offset>[];
+
+  ui.Image get rendered {
+    ui.PictureRecorder recorder = ui.PictureRecorder();
+    Canvas canvas = Canvas(recorder);
+    SignaturePainter painter = SignaturePainter(points: _points);
+
+    var size = context.size;
+    return recorder.endRecording()
+        .toImage(size.width.floor(), size.height.floor());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,44 +63,37 @@ class _HomePageState extends State<HomePage> {
           onPanUpdate: (DragUpdateDetails details) {
             setState(() {
               RenderBox _object = context.findRenderObject();
-              Offset _locationPoints = _object.globalToLocal(details.globalPosition);
+              Offset _locationPoints = _object.localToGlobal(details.globalPosition);
               _points = new List.from(_points)..add(_locationPoints);
             });
           },
-          onPanEnd: (DragEndDetails details) => _points.add(null),
+          onPanEnd: (DragEndDetails details) {
+            setState(() {
+              _points.add(null);
+            });
+          },
           child: CustomPaint(
-            painter: new Signature(points: _points),
+            painter: SignaturePainter(points: _points),
             size: Size.infinite,
           ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.clear),
-        onPressed: () {
-          setState(() {
-            _points.clear();
-          });
-        },
       ),
     );
   }
 }
 
-class Signature extends CustomPainter {
+class SignaturePainter extends CustomPainter {
+  List<Offset> points = <Offset>[];
 
-  List<Offset> points;
-
-  Signature({this.points});
-
+  SignaturePainter({this.points});
   @override
   void paint(Canvas canvas, Size size) {
+    var paint = Paint()
+      ..color = Colors.blue
+      ..strokeCap = StrokeCap.square
+      ..strokeWidth = 5.0;
 
-    Paint paint = Paint()
-    ..color = Colors.blue
-    ..strokeCap = StrokeCap.round
-    ..strokeWidth = 5.0;
-
-    for(int i = 0; i < points.length; i++) {
+    for(int i=0; i < points.length - 1; i++) {
       if(points[i] != null && points[i+1] != null) {
         canvas.drawLine(points[i], points[i+1], paint);
       }
@@ -67,7 +101,7 @@ class Signature extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(Signature oldDelegate) {
+  bool shouldRepaint(SignaturePainter oldDelegate) {
     return oldDelegate.points != points;
   }
 
