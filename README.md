@@ -1,21 +1,27 @@
 # Signature
 
 A flutter implementation of drawing app.
-Which exports image to PNG format.
+Which exports image to storage in PNG format.
 
 Here is main.dart
 ```dart
-import 'package:flutter/material.dart';
-import 'dart:ui' as ui;
+import 'dart:io';
 import 'dart:async';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:simple_permissions/simple_permissions.dart';
+
+const directoryName = 'Signature';
 
 void main() {
   runApp(
-    MaterialApp(
-      home: SignApp(),
-      debugShowCheckedModeBanner: false,
-    )
+      MaterialApp(
+        home: SignApp(),
+        debugShowCheckedModeBanner: false,
+      )
   );
 }
 
@@ -29,6 +35,34 @@ class SignApp extends StatefulWidget {
 class SignAppState extends State<SignApp> {
   GlobalKey<SignatureState> signatureKey = GlobalKey();
   var image;
+  String _platformVersion = 'Unknown';
+  Permission _permission = Permission.WriteExternalStorage;
+
+  @override
+  void initState() {
+    super.initState();
+    initPlatformState();
+  }
+  // Platform messages are asynchronous, so we initialize in an async method.
+  initPlatformState() async {
+    String platformVersion;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      platformVersion = await SimplePermissions.platformVersion;
+    } on PlatformException {
+      platformVersion = 'Failed to get platform version.';
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() {
+      _platformVersion = platformVersion;
+    });
+    print(_platformVersion);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,16 +93,39 @@ class SignAppState extends State<SignApp> {
 
   Future<Null> showImage(BuildContext context) async {
     var pngBytes = await image.toByteData(format: ui.ImageByteFormat.png);
+    if(!(await checkPermission())) await requestPermission();
     // Use plugin [path_provider] to export image to storage
+    Directory directory = await getExternalStorageDirectory();
+    String path = directory.path;
+    print(path);
+    await Directory('$path/$directoryName').create(recursive: true);
+    File('$path/$directoryName/${DateTime.now().toIso8601String()}.png')
+        .writeAsBytesSync(pngBytes.buffer.asInt8List());
     return showDialog<Null>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: Image.memory(Uint8List.view(pngBytes.buffer)),
-        );
-      }
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Image.memory(Uint8List.view(pngBytes.buffer)),
+          );
+        }
     );
   }
+
+  requestPermission() async {
+    bool result = await SimplePermissions.requestPermission(_permission);
+    return result;
+  }
+
+  checkPermission() async {
+    bool result = await SimplePermissions.checkPermission(_permission);
+    return result;
+  }
+
+  getPermissionStatus() async {
+    final result = await SimplePermissions.getPermissionStatus(_permission);
+    print("permission status is " + result.toString());
+  }
+
 }
 
 class Signature extends StatefulWidget {
