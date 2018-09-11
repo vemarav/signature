@@ -1,4 +1,4 @@
-package com.example.signature;
+package com.vemarav.signature;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;
