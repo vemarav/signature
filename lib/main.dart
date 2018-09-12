@@ -98,6 +98,15 @@ class SignAppState extends State<SignApp> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
+            title: Text(
+              'Please check your device\'s Signature folder',
+              style: TextStyle(
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.w300,
+                color: Theme.of(context).primaryColor,
+                letterSpacing: 1.1
+              ),
+            ),
             content: Image.memory(Uint8List.view(pngBytes.buffer)),
           );
         }
