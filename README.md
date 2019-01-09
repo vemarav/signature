@@ -1,6 +1,6 @@
 # Signature
 
-[![Demo](https://github.com/vemarav/signature/blob/master/demo.png)](https://www.youtube.com/watch?v=mM2Z-kHjELw)
+[![Demo](https://res.cloudinary.com/vemarav/image/upload/c_scale,h_480,w_240/v1547048611/Github/demo.png)](https://www.youtube.com/watch?v=mM2Z-kHjELw)
 
 A flutter implementation of drawing app.
 Which exports image to storage in PNG format.
