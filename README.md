@@ -1,12 +1,21 @@
-# Signature
+Signature
+---
 
-[![Demo](https://res.cloudinary.com/vemarav/image/upload/c_scale,h_480,w_240/v1547048611/Github/demo.png)](https://www.youtube.com/watch?v=mM2Z-kHjELw)
 
-A flutter implementation of drawing app.
-Which exports image to storage in PNG format.
+A flutter implementation of drawing app. 
+Export image to storage in PNG format.
 
-Here is main.dart
+[![Available on Google Play](https://res.cloudinary.com/vemarav/image/upload/c_scale,w_150/v1547657954/get_it_on_google_play.png)](https://play.google.com/store/apps/details?id=com.vemarav.signature&hl=en)
+
+[![Demo](https://res.cloudinary.com/vemarav/image/upload/c_scale,h_340,w_160/v1547048611/Github/demo.png)](https://www.youtube.com/watch?v=mM2Z-kHjELw)
+
+
+Implementation
+---
 ```dart
+
+// file lib/main.dart
+
 import 'dart:io';
 import 'dart:async';
 import 'dart:typed_data';
@@ -101,16 +110,39 @@ class SignAppState extends State<SignApp> {
     String path = directory.path;
     print(path);
     await Directory('$path/$directoryName').create(recursive: true);
-    File('$path/$directoryName/${DateTime.now().toIso8601String()}.png')
+    File('$path/$directoryName/${formattedDate()}.png')
         .writeAsBytesSync(pngBytes.buffer.asInt8List());
     return showDialog<Null>(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
+            title: Text(
+              'Please check your device\'s Signature folder',
+              style: TextStyle(
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.w300,
+                color: Theme.of(context).primaryColor,
+                letterSpacing: 1.1
+              ),
+            ),
             content: Image.memory(Uint8List.view(pngBytes.buffer)),
           );
         }
     );
+  }
+
+  String formattedDate() {
+    DateTime dateTime = DateTime.now();
+    String dateTimeString = 'Signature_' +
+        dateTime.year.toString() +
+            dateTime.month.toString() +
+            dateTime.day.toString() +
+            dateTime.hour.toString() +
+            ':' + dateTime.minute.toString() +
+            ':' + dateTime.second.toString() +
+            ':' + dateTime.millisecond.toString() +
+            ':' + dateTime.microsecond.toString();
+    return dateTimeString;
   }
 
   requestPermission() async {
@@ -225,4 +257,21 @@ class SignaturePainter extends CustomPainter {
   }
 
 }
+
 ```
+
+Licence
+---
+
+Package published under [MIT License](https://opensource.org/licenses/MIT)
+
+Author
+---
+
+- [Aravind Vemula](https://github.com/vemarav)
+
+SOCIAL
+---
+
+[![Twitter Follow](https://img.shields.io/twitter/follow/vemarav.svg?style=social&label=Follow)](https://twitter.com/vemarav)
+
