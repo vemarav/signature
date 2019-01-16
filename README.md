@@ -17,14 +17,14 @@ Checkout file [signature/lib/main.dart](https://github.com/vemarav/signature/blo
 Licence
 ---
 
-Package published under [MIT License](https://opensource.org/licenses/MIT)
+[MIT License](https://opensource.org/licenses/MIT)
 
 Author
 ---
 
 - [Aravind Vemula](https://github.com/vemarav)
 
-SOCIAL
+Social
 ---
 
 [![Twitter Follow](https://img.shields.io/twitter/follow/vemarav.svg?style=social&label=Follow)](https://twitter.com/vemarav)
