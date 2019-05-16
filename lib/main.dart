@@ -74,14 +74,21 @@ class SignAppState extends State<SignApp> {
             // Future will resolve later
             // so setState @image here and access in #showImage
             // to avoid @null Checks
-            setState(() {
-              image = signatureKey.currentState.rendered;
-            });
-            showImage(context);
+            setRenderedImage(context);
           },
         )
       ],
     );
+  }
+
+  setRenderedImage(BuildContext context) async {
+    ui.Image renderedImage = await signatureKey.currentState.rendered;
+
+    setState(() {
+      image = renderedImage;
+    });
+
+    showImage(context);
   }
 
   Future<Null> showImage(BuildContext context) async {
@@ -159,7 +166,7 @@ class SignatureState extends State<Signature> {
   // [SignaturePainter]#contructor to draw canvas
   List<Offset> _points = <Offset>[];
 
-  ui.Image get rendered {
+  Future<ui.Image> get rendered {
     // [CustomPainter] has its own @canvas to pass our
     // [ui.PictureRecorder] object must be passed to [Canvas]#contructor
     // to capture the Image. This way we can pass @recorder to [Canvas]#contructor
